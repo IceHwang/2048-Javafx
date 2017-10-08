@@ -8,7 +8,7 @@ public class Card extends ImageView
 
 
     int num=0;
-    final static int height=100;
+
     final static int width=100;
     final static Image[] images=
     {
@@ -30,7 +30,7 @@ public class Card extends ImageView
     public Card()
     {
         super();
-        setFitHeight(height);
+        setFitHeight(width);
         setFitWidth(width);
         setNum(0);
     }

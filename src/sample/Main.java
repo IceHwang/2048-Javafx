@@ -1,21 +1,23 @@
 package sample;
 
 
+import javafx.animation.PathTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
-
+import javafx.util.Duration;
 import java.util.LinkedList;
 
 
 public class Main extends Application
 {
     Card[][] cards=new Card[4][4];
-    //Card[][] animCards=new Card[4][4];
+    Card[][] animCards=new Card[4][4];
     LinkedList<Point> emptyPoints=new LinkedList<>();
     private final int m_left = 0, m_right = 1, m_up = 2, m_down = 3;
 
@@ -23,13 +25,17 @@ public class Main extends Application
     @Override
     public void start(Stage primaryStage) throws Exception{
         StackPane stackPane =new StackPane();
-        GridPane cardsPane=new GridPane();
-        cardsPane.setStyle("-fx-background-color: #b2ada0");
+        GridPane backgroundPane=new GridPane();
+        backgroundPane.setStyle("-fx-background-color: #b2ada0");
 
-        //GridPane animPane=new GridPane();
+        GridPane cardsPane=new GridPane();
+        //cardsPane.setStyle("-fx-background-color: #b2ada0");
+
+        GridPane animPane=new GridPane();
         stackPane.setAlignment(Pos.CENTER);
+        stackPane.getChildren().add(backgroundPane);
         stackPane.getChildren().add(cardsPane);
-        //stackPane.getChildren().add(animPane);
+        stackPane.getChildren().add(animPane);
 
         stackPane.setOnKeyPressed(event ->
         {
@@ -53,13 +59,30 @@ public class Main extends Application
         });
 
         gamestart();
-
+        for(int x=0;x<4;x++)
+        {
+            for (int y=0;y<4;y++)
+            {
+                Card card=new Card();
+                GridPane.setMargin(card,new Insets(5));
+                cardsPane.add(card,x,y);
+            }
+        }
         for(int x=0;x<4;x++)
         {
             for (int y=0;y<4;y++)
             {
                 GridPane.setMargin(cards[x][y],new Insets(5));
                 cardsPane.add(cards[x][y],x,y);
+            }
+        }
+        for(int x=0;x<4;x++)
+        {
+            for (int y=0;y<4;y++)
+            {
+                animPane.setMargin(animCards[x][y],new Insets(5));
+                animCards[x][y].setVisible(false);
+                cardsPane.add(animCards[x][y],x,y);
             }
         }
 
@@ -69,7 +92,7 @@ public class Main extends Application
         primaryStage.setResizable(false);
         primaryStage.show();
         stackPane.requestFocus();
-
+        gameover();
 
 
 
@@ -84,6 +107,11 @@ public class Main extends Application
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 4; x++) {
                 cards[x][y]=new Card();
+            }
+        }
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 4; x++) {
+                animCards[x][y]=new Card();
             }
         }
 
@@ -115,12 +143,15 @@ public class Main extends Application
             return false;
         }
 
+
         return true;
 
     }
 
     private void move(int direc)
     {
+
+
         boolean flag=false;
 
         switch (direc) {
@@ -147,6 +178,7 @@ public class Main extends Application
 //                }
 //            }
 //            pre_score = tmp_score;
+
 
 
 
@@ -208,7 +240,7 @@ public class Main extends Application
                     {
                         xx++;
 
-                        //AnimView.getAnimView().moveAnim(x,xx,y,y,cards[x][y].getNum());
+                        moveAnim(x,xx,y,y);
                         cards[xx][y].setNum(cards[x][y].getNum());
                         cards[x][y].setNum(0);
 
@@ -227,7 +259,7 @@ public class Main extends Application
                     {
 
 
-                        //AnimView.getAnimView().moveAnim(x,xx,y,y,cards[x][y].getNum());
+                        moveAnim(x,xx,y,y);
                         cards[xx][y].setNum(cards[x][y].getNum()*2);
                         cards[x][y].setNum(0);
 
@@ -247,7 +279,7 @@ public class Main extends Application
                             break;
 
 
-//                        AnimView.getAnimView().moveAnim(x,xx,y,y,cards[x][y].getNum());
+                        moveAnim(x,xx,y,y);
                         cards[xx][y].setNum(cards[x][y].getNum());
                         cards[x][y].setNum(0);
 
@@ -289,7 +321,7 @@ public class Main extends Application
                     {
                         xx--;
 
-                        //AnimView.getAnimView().moveAnim(x,xx,y,y,cards[x][y].getNum());
+                        moveAnim(x,xx,y,y);
                         cards[xx][y].setNum(cards[x][y].getNum());
                         cards[x][y].setNum(0);
 
@@ -308,7 +340,7 @@ public class Main extends Application
                     {
                         //MainActivity.getMainActivity().addScore(cards[x][y].getNum()*2);
 
-                        //AnimView.getAnimView().moveAnim(x,xx,y,y,cards[x][y].getNum());
+                        moveAnim(x,xx,y,y);
                         cards[xx][y].setNum(cards[x][y].getNum()*2);
                         cards[x][y].setNum(0);
 
@@ -328,7 +360,7 @@ public class Main extends Application
                             break;
 
 
-                        //AnimView.getAnimView().moveAnim(x,xx,y,y,cards[x][y].getNum());
+                        moveAnim(x,xx,y,y);
                         cards[xx][y].setNum(cards[x][y].getNum());
                         cards[x][y].setNum(0);
 
@@ -370,7 +402,7 @@ public class Main extends Application
                     {
                         yy++;
 
-                        //AnimView.getAnimView().moveAnim(x,x,y,yy,cards[x][y].getNum());
+                        moveAnim(x,x,y,yy);
                         cards[x][yy].setNum(cards[x][y].getNum());
                         cards[x][y].setNum(0);
 
@@ -389,7 +421,7 @@ public class Main extends Application
                     {
                         //MainActivity.getMainActivity().addScore(cards[x][y].getNum()*2);
 
-                        //AnimView.getAnimView().moveAnim(x,x,y,yy,cards[x][y].getNum());
+                        moveAnim(x,x,y,yy);
                         cards[x][yy].setNum(cards[x][y].getNum()*2);
                         cards[x][y].setNum(0);
 
@@ -409,7 +441,7 @@ public class Main extends Application
                             break;
 
 
-                        //AnimView.getAnimView().moveAnim(x,x,y,yy,cards[x][y].getNum());
+                        moveAnim(x,x,y,yy);
                         cards[x][yy].setNum(cards[x][y].getNum());
                         cards[x][y].setNum(0);
 
@@ -451,7 +483,7 @@ public class Main extends Application
                     {
                         yy--;
 
-                        //AnimView.getAnimView().moveAnim(x,x,y,yy,cards[x][y].getNum());
+                        moveAnim(x,x,y,yy);
                         cards[x][yy].setNum(cards[x][y].getNum());
                         cards[x][y].setNum(0);
 
@@ -470,7 +502,7 @@ public class Main extends Application
                     {
                         //MainActivity.getMainActivity().addScore(cards[x][y].getNum()*2);
 
-                        //AnimView.getAnimView().moveAnim(x,x,y,yy,cards[x][y].getNum());
+                       moveAnim(x,x,y,yy);
                         cards[x][yy].setNum(cards[x][y].getNum()*2);
                         cards[x][y].setNum(0);
 
@@ -490,7 +522,7 @@ public class Main extends Application
                             break;
 
 
-                        //AnimView.getAnimView().moveAnim(x,x,y,yy,cards[x][y].getNum());
+                        moveAnim(x,x,y,yy);
                         cards[x][yy].setNum(cards[x][y].getNum());
                         cards[x][y].setNum(0);
 
@@ -516,6 +548,22 @@ public class Main extends Application
     }
 
 
+
+    public void moveAnim(final int from_x, final int to_x, final int from_y, final int to_y)
+    {
+        double width=Card.width;
+        animCards[from_x][from_y].setNum(cards[from_x][from_y].getNum());
+        animCards[from_x][from_y].setVisible(true);
+        PathTransition anim=new PathTransition();
+        anim.setDuration(Duration.millis(150));
+        anim.setPath(new Line(0.5*width,0.5*width,
+                (to_x-from_x+0.5)*width,(to_y-from_y+0.5)*width));
+        anim.setNode(animCards[from_x][from_y]);
+        anim.play();
+
+        anim.setOnFinished(event -> animCards[from_x][from_y].setVisible(false));
+
+    }
 
 
 
