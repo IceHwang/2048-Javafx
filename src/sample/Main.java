@@ -1,6 +1,7 @@
 package sample;
 
 
+import javafx.animation.FadeTransition;
 import javafx.animation.PathTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -12,6 +13,8 @@ import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class Main extends Application
@@ -20,6 +23,9 @@ public class Main extends Application
     Card[][] animCards=new Card[4][4];
     LinkedList<Point> emptyPoints=new LinkedList<>();
     private final int m_left = 0, m_right = 1, m_up = 2, m_down = 3;
+
+    //status为false时没有动画正在移动，为ture时可能有动画正在移动
+    boolean moveStatus=false;
 
 
     @Override
@@ -92,7 +98,7 @@ public class Main extends Application
         primaryStage.setResizable(false);
         primaryStage.show();
         stackPane.requestFocus();
-        gameover();
+
 
 
 
@@ -135,7 +141,7 @@ public class Main extends Application
         Point point = emptyPoints.remove((int) (Math.random() * emptyPoints.size()));
 
         cards[point.x][point.y].setNum(Math.random() > 0.1 ? 2 : 4);
-
+        addCardAnim(point.x,point.y);
 
 
         if (emptyPoints.size() == 0) {
@@ -151,6 +157,18 @@ public class Main extends Application
     private void move(int direc)
     {
 
+        if(moveStatus==true)
+            return;
+        moveStatus=true;
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                moveStatus=false;
+            }
+        }, 200);
+        timer=null;
 
         boolean flag=false;
 
@@ -220,7 +238,7 @@ public class Main extends Application
 
     private void gameover()
     {
-
+        System.out.println("Game over");
     }
 
     private boolean moveLeft()
@@ -241,6 +259,7 @@ public class Main extends Application
                         xx++;
 
                         moveAnim(x,xx,y,y);
+
                         cards[xx][y].setNum(cards[x][y].getNum());
                         cards[x][y].setNum(0);
 
@@ -248,6 +267,7 @@ public class Main extends Application
                         //animator.setTarget(cards[xx][y]);
                         //animator.setStartDelay(250);
                         //animator.start();
+
                         flag=true;
                         break;
                     }
@@ -260,6 +280,7 @@ public class Main extends Application
 
 
                         moveAnim(x,xx,y,y);
+
                         cards[xx][y].setNum(cards[x][y].getNum()*2);
                         cards[x][y].setNum(0);
 
@@ -280,6 +301,7 @@ public class Main extends Application
 
 
                         moveAnim(x,xx,y,y);
+
                         cards[xx][y].setNum(cards[x][y].getNum());
                         cards[x][y].setNum(0);
 
@@ -561,9 +583,29 @@ public class Main extends Application
         anim.setNode(animCards[from_x][from_y]);
         anim.play();
 
-        anim.setOnFinished(event -> animCards[from_x][from_y].setVisible(false));
+        anim.setOnFinished(event -> {
+            animCards[from_x][from_y].setVisible(false);
+        });
 
     }
+
+    public void addCardAnim(int x,int y)
+    {
+        FadeTransition fadeTransition1=new FadeTransition(Duration.millis(300));
+        fadeTransition1.setFromValue(0.0f);
+        fadeTransition1.setToValue(0.0f);
+        fadeTransition1.setNode(cards[x][y]);
+        fadeTransition1.play();
+
+        FadeTransition fadeTransition2=new FadeTransition(Duration.millis(300));
+        fadeTransition2.setFromValue(0.0f);
+        fadeTransition2.setToValue(1.0f);
+        fadeTransition2.setNode(cards[x][y]);
+
+        fadeTransition1.setOnFinished(event -> fadeTransition2.play());
+    }
+
+
 
 
 
