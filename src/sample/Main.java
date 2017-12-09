@@ -7,11 +7,15 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,9 +39,9 @@ public class Main extends Application
         backgroundPane.setStyle("-fx-background-color: #b2ada0");
 
         GridPane cardsPane=new GridPane();
-        //cardsPane.setStyle("-fx-background-color: #b2ada0");
 
         GridPane animPane=new GridPane();
+
         stackPane.setAlignment(Pos.CENTER);
         stackPane.getChildren().add(backgroundPane);
         stackPane.getChildren().add(cardsPane);
@@ -98,10 +102,6 @@ public class Main extends Application
         primaryStage.setResizable(false);
         primaryStage.show();
         stackPane.requestFocus();
-
-
-
-
     }
 
     public static void main(String[] args) {
@@ -238,7 +238,30 @@ public class Main extends Application
 
     private void gameover()
     {
-        System.out.println("Game over");
+        Stage stage=new Stage();
+        VBox vBox=new VBox();
+        Label label=new Label("GAME OVER");
+        Button button =new Button("OK");
+        vBox.getChildren().addAll(label,button);
+        VBox.setMargin(label,new Insets(80,80,50,80));
+        VBox.setMargin(button,new Insets(0,80,30,100));
+        stage.setScene(new Scene(vBox));
+        stage.show();
+        stage.setResizable(false);
+        button.setOnAction(event ->
+        {
+            stage.close();
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    cards[i][j].setNum(0);
+                    animCards[i][j].setNum(0);
+                }
+            }
+            addRandomNum();
+            addRandomNum();
+        });
     }
 
     private boolean moveLeft()
