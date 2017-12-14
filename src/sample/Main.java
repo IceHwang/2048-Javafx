@@ -1,17 +1,15 @@
 package sample;
 
-
 import javafx.animation.FadeTransition;
 import javafx.animation.PathTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -21,8 +19,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
+
 public class Main extends Application
 {
+    static Main example;
     Card[][] cards=new Card[4][4];
     Card[][] animCards=new Card[4][4];
     LinkedList<Point> emptyPoints=new LinkedList<>();
@@ -30,11 +30,15 @@ public class Main extends Application
 
     //status为false时没有动画正在移动，为ture时可能有动画正在移动
     boolean moveStatus=false;
+    ImageView GameOverImageView=new ImageView(new Image("image/GameOver.png"));
+    ImageView YouWinImageView=new ImageView(new Image("image/YouWin.png"));
 
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        example=this;
         StackPane stackPane =new StackPane();
+
         GridPane backgroundPane=new GridPane();
         backgroundPane.setStyle("-fx-background-color: #b2ada0");
 
@@ -96,20 +100,31 @@ public class Main extends Application
             }
         }
 
+        GameOverImageView.setFitHeight(430);
+        GameOverImageView.setFitWidth(430);
+        stackPane.getChildren().add(GameOverImageView);
+        GameOverImageView.setVisible(false);
+
+        YouWinImageView.setFitHeight(430);
+        YouWinImageView.setFitWidth(430);
+        stackPane.getChildren().add(YouWinImageView);
+        YouWinImageView.setVisible(false);
+
         Scene scene =new Scene(stackPane);
         primaryStage.setScene(scene);
         primaryStage.setTitle("2048");
         primaryStage.setResizable(false);
         primaryStage.show();
         stackPane.requestFocus();
+
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 
-
-    public void gamestart() {
+    public void gamestart()
+    {
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 4; x++) {
                 cards[x][y]=new Card();
@@ -127,7 +142,8 @@ public class Main extends Application
 
     }
 
-    private boolean addRandomNum() {
+    private boolean addRandomNum()
+    {
         emptyPoints.clear();
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 4; x++) {
@@ -238,25 +254,91 @@ public class Main extends Application
 
     private void gameover()
     {
-        Stage stage=new Stage();
-        VBox vBox=new VBox();
-        Label label=new Label("GAME OVER");
-        Button button =new Button("OK");
-        vBox.getChildren().addAll(label,button);
-        VBox.setMargin(label,new Insets(80,80,50,80));
-        VBox.setMargin(button,new Insets(0,80,30,100));
-        stage.setScene(new Scene(vBox));
-        stage.show();
-        stage.setResizable(false);
-        button.setOnAction(event ->
+        GameOverImageView.setVisible(true);
+        FadeTransition fadeTransition1=new FadeTransition(Duration.millis(800));
+        fadeTransition1.setFromValue(0.0f);
+        fadeTransition1.setToValue(0.7f);
+        fadeTransition1.setNode(GameOverImageView);
+        fadeTransition1.play();
+
+        FadeTransition fadeTransition2=new FadeTransition(Duration.millis(1000));
+        fadeTransition2.setFromValue(0.7f);
+        fadeTransition2.setToValue(0.0f);
+        fadeTransition2.setNode(GameOverImageView);
+
+        fadeTransition1.setOnFinished(event ->
         {
-            stage.close();
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    cards[i][j].setNum(0);
-                    animCards[i][j].setNum(0);
+
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    fadeTransition2.play();
+
+
+                }
+            }, 2000);
+            timer=null;
+
+        });
+        fadeTransition2.setOnFinished(event ->
+        {
+            GameOverImageView.setVisible(false);
+            for (int y = 0; y < 4; y++) {
+                for (int x = 0; x < 4; x++) {
+                    cards[x][y].setNum(0);
+                }
+            }
+            for (int y = 0; y < 4; y++) {
+                for (int x = 0; x < 4; x++) {
+                    animCards[x][y].setNum(0);
+                }
+            }
+            addRandomNum();
+            addRandomNum();
+        });
+    }
+
+    public void youwin()
+    {
+        YouWinImageView.setVisible(true);
+        FadeTransition fadeTransition1=new FadeTransition(Duration.millis(800));
+        fadeTransition1.setFromValue(0.0f);
+        fadeTransition1.setToValue(0.7f);
+        fadeTransition1.setNode(YouWinImageView);
+        fadeTransition1.play();
+
+        FadeTransition fadeTransition2=new FadeTransition(Duration.millis(1000));
+        fadeTransition2.setFromValue(0.7f);
+        fadeTransition2.setToValue(0.0f);
+        fadeTransition2.setNode(YouWinImageView);
+
+        fadeTransition1.setOnFinished(event ->
+        {
+
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    fadeTransition2.play();
+
+
+                }
+            }, 2000);
+            timer=null;
+
+        });
+        fadeTransition2.setOnFinished(event ->
+        {
+            YouWinImageView.setVisible(false);
+            for (int y = 0; y < 4; y++) {
+                for (int x = 0; x < 4; x++) {
+                    cards[x][y].setNum(0);
+                }
+            }
+            for (int y = 0; y < 4; y++) {
+                for (int x = 0; x < 4; x++) {
+                    animCards[x][y].setNum(0);
                 }
             }
             addRandomNum();
@@ -592,8 +674,6 @@ public class Main extends Application
 
     }
 
-
-
     public void moveAnim(final int from_x, final int to_x, final int from_y, final int to_y)
     {
         double width=Card.width;
@@ -627,9 +707,4 @@ public class Main extends Application
 
         fadeTransition1.setOnFinished(event -> fadeTransition2.play());
     }
-
-
-
-
-
 }

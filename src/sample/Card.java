@@ -74,6 +74,7 @@ public class Card extends ImageView
                 this.setImage(images[10]);
                 break;
             case 2048:
+                Main.example.youwin();
                 this.setImage(images[11]);
                 break;
             default:
